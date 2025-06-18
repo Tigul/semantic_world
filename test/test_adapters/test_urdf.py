@@ -29,21 +29,28 @@ class URDFParserTestCase(unittest.TestCase):
     def test_kitchen_parsing(self):
         world = self.kitchen_parser.parse()
         world.validate()
-        self.assertTrue(len(world.bodies) > 0)
-        self.assertTrue(len(world.connections) > 0)
+        self.assertGreater(len(world.bodies), 0)
+        self.assertGreater(len(world.connections), 0)
 
     def test_apartment_parsing(self):
         world = self.apartment_parser.parse()
         world.validate()
-        self.assertTrue(len(world.bodies) > 0)
-        self.assertTrue(len(world.connections) > 0)
+        self.assertGreater(len(world.bodies), 0)
+        self.assertGreater(len(world.connections), 0)
 
     def test_pr2_parsing(self):
         world = self.pr2_parser.parse()
         world.validate()
-        self.assertTrue(len(world.bodies) > 0)
-        self.assertTrue(len(world.connections) > 0)
-        self.assertTrue(world.root.name.name == 'base_footprint')
+        self.assertGreater(len(world.bodies), 0)
+        self.assertGreater(len(world.connections), 0)
+        self.assertEqual(world.root.name.name, 'base_footprint')
+
+    def test_pr2_parsing_collisions(self):
+        world = self.pr2_parser.parse()
+        world.validate()
+        self.assertGreater(len(world.bodies), 0)
+        self.assertGreater(len(world.connections), 0)
+        self.assertGreater(len(world.bodies_with_collisions), 0)
 
 
 if __name__ == '__main__':
