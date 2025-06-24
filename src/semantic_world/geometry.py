@@ -4,7 +4,7 @@ from abc import ABC
 from dataclasses import dataclass, field
 from functools import cached_property
 
-import trimesh
+import open3d
 
 from .spatial_types import TransformationMatrix
 from .utils import IDGenerator
@@ -83,11 +83,12 @@ class Mesh(Shape):
     """
 
     @cached_property
-    def mesh(self) -> trimesh.Trimesh:
+    def mesh(self) -> open3d.t.geometry.TriangleMesh:
         """
         The mesh object.
         """
-        return trimesh.load_mesh(self.filename)
+        o3d_mesh = open3d.io.read_triangle_mesh(self.filename)
+        return open3d.t.geometry.TriangleMesh().from_legacy(mesh_legacy=o3d_mesh)
 
 
 @dataclass

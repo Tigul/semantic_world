@@ -1,9 +1,10 @@
+from copy import copy
 from typing import Dict, List
 
 import numpy as np
 
 from .world import World
-from .geometry import Mesh
+from .geometry import Mesh, Box, Cylinder, Sphere
 
 
 class Renderer:
@@ -29,13 +30,13 @@ class Renderer:
         scene = open3d.t.geometry.RaycastingScene()
         for body in self.world.bodies:
             for collision_shape in body.collision:
+                pose_transform = self.world.compute_forward_kinematics_np(self.world.root, body)
                 if isinstance(collision_shape, Mesh):
-                    o3d_mesh = open3d.io.read_triangle_mesh(collision_shape.filename)
-                    triangles = open3d.t.geometry.TriangleMesh().from_legacy(mesh_legacy=o3d_mesh) # TODO Add transformation
-                    self.bodies_to_scene[body] = scene.add_triangles(triangles)
+                    self.bodies_to_scene[body] = scene.add_triangles(copy(collision_shape.mesh).transform(pose_transform))
         self.scene = scene
         self.world_model_version = self.world._model_version
         self.world_state_version = self.world._state_version
+
 
     def create_segmentation_mask(self, camera_pose: List[float], target_pose: List[float]):
         """
@@ -66,14 +67,13 @@ class Renderer:
         :param target_pose: The pose of the target as a list of floats [x, y, z], in world coordinates.
         :return: A dictionary containing the results of the raycasting, including 'geometry_ids' and 't_hit'.
         """
-        import open3d
+        self.create_raycast_scene()
         rays = self.scene.create_rays_pinhole(
             fov_deg=90,
-            center=camera_pose[:3],
-            eye=target_pose[:3],
+            center=target_pose,
+            eye=camera_pose,
             up=[0, 0, -1],
             width_px=640,
             height_px=480
         )
-        ans = self.scene.cast_rays(rays)
-        return ans
+        return self.scene.cast_rays(rays)

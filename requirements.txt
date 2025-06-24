@@ -1,6 +1,5 @@
 networkx~=3.4.2
 numpy~=1.26.4
-trimesh~=4.6.8
 typing_extensions
 urdf-parser-py
 matplotlib<3.8.0
@@ -12,3 +11,4 @@ ormatic
 sqlacodegen
 ripple_down_rules
 pytest-order
+open3d
