@@ -32,11 +32,27 @@ class Renderer:
             for collision_shape in body.collision:
                 pose_transform = self.world.compute_forward_kinematics_np(self.world.root, body)
                 if isinstance(collision_shape, Mesh):
-                    self.bodies_to_scene[body] = scene.add_triangles(copy(collision_shape.mesh).transform(pose_transform))
+                    self.bodies_to_scene[body] = scene.add_triangles(
+                        copy(collision_shape.mesh).transform(pose_transform))
+                elif isinstance(collision_shape, Box):
+                    box = open3d.geometry.TriangleMesh().create_box(width=collision_shape.scale.x,
+                                                                    height=collision_shape.scale.y,
+                                                                    depth=collision_shape.scale.z).transform(
+                        pose_transform)
+                    tensor_box = open3d.t.geometry.TriangleMesh.from_legacy(box)
+                    self.bodies_to_scene[collision_shape] = scene.add_triangles(tensor_box)
+                elif isinstance(collision_shape, Cylinder):
+                    self.bodies_to_scene[body] = scene.add_triangles(
+                        open3d.t.geometry.TriangleMesh().create_cylinder(radius=collision_shape.width / 2,
+                                                                         height=collision_shape.height).transform(
+                            pose_transform))
+                elif isinstance(collision_shape, Sphere):
+                    self.bodies_to_scene[body] = scene.add_triangles(
+                        open3d.t.geometry.TriangleMesh().create_sphere(radius=collision_shape.radius).transform(
+                            pose_transform))
         self.scene = scene
         self.world_model_version = self.world._model_version
         self.world_state_version = self.world._state_version
-
 
     def create_segmentation_mask(self, camera_pose: List[float], target_pose: List[float]):
         """
@@ -46,7 +62,7 @@ class Renderer:
         :param target_pose: The pose of the target as a list of floats [x, y, z], in world coordinates.
         :return: An array of the visible bodies in the world
         """
-        mask =  self.cast_rays_in_scene(camera_pose, target_pose)["geometry_ids"].numpy()
+        mask = self.cast_rays_in_scene(camera_pose, target_pose)["geometry_ids"].numpy()
         vectorized_map = np.vectorize(lambda x: self.bodies_to_scene[x])
         return vectorized_map(mask)
 
@@ -58,7 +74,6 @@ class Renderer:
         :return: A numpy array of shape (height, width) containing the depth values.
         """
         return self.cast_rays_in_scene(camera_pose, target_pose)["t_hit"].numpy()
-
 
     def cast_rays_in_scene(self, camera_pose: List[float], target_pose: List[float]) -> Dict[str, np.ndarray]:
         """
