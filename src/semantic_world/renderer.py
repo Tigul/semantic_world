@@ -92,3 +92,22 @@ class Renderer:
             height_px=480
         )
         return self.scene.cast_rays(rays)
+
+    def calculate_signed_distance(self, min_pose: np.ndarray, max_pose: np.ndarray, steps: int = 32) -> np.ndarray:
+        """
+        Calculate the signed distance field for a given bounding box defined by min and max poses. The bounding box is
+        discretized into a grid of points by the steps parameter, and the signed distance is computed for each point.
+        :param min_pose: The minimum pose of the bounding box as a numpy array of shape (3,).
+        :param max_pose: The maximum pose of the bounding box as a numpy array of shape (3,).
+        :param steps: The number of steps to divide the bounding box into, default is 32.
+        :return: A numpy array containing the signed distance values.
+        """
+        self.create_raycast_scene()
+        xyz_range = np.linspace(min_pose, max_pose, num=steps)
+
+        # query_points is a [steps,steps,steps,3] array ..
+        query_points = np.stack(np.meshgrid(*xyz_range.T), axis=-1).astype(np.float32)
+
+        # signed distance is a [32,32,32] array
+        signed_distance = self.scene.compute_signed_distance(query_points).numpy()
+        return signed_distance
