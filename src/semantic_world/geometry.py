@@ -90,6 +90,13 @@ class Mesh(Shape):
         o3d_mesh = open3d.io.read_triangle_mesh(self.filename)
         return open3d.t.geometry.TriangleMesh().from_legacy(mesh_legacy=o3d_mesh)
 
+    def __hash__(self):
+        """
+        Hash function for the mesh shape.
+        :return: Hash value of the mesh shape.
+        """
+        return id(self)
+
 
 @dataclass
 class Primitive(Shape):
@@ -110,6 +117,13 @@ class Sphere(Primitive):
     Radius of the sphere.
     """
 
+    def __hash__(self):
+        """
+        Hash function for the sphere shape.
+        :return: Hash value of the sphere shape.
+        """
+        return id(self)
+
 
 @dataclass
 class Cylinder(Primitive):
@@ -119,6 +133,13 @@ class Cylinder(Primitive):
     width: float = 0.5
     height: float = 0.5
 
+    def __hash__(self):
+        """
+        Hash function for the cylinder shape.
+        :return: Hash value of the cylinder shape.
+        """
+        return id(self)
+
 
 @dataclass
 class Box(Primitive):
@@ -126,4 +147,11 @@ class Box(Primitive):
     A box shape. Pivot point is at the center of the box.
     """
     scale: Scale = field(default_factory=Scale)
+
+    def __hash__(self):
+        """
+        Hash function for the box shape.
+        :return: Hash value of the box shape.
+        """
+        return id(self)
 
