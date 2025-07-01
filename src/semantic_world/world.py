@@ -704,3 +704,47 @@ class World:
             if isinstance(connection, HasUpdateState):
                 connection.update_state(dt)
         self.notify_state_change()
+
+    def set_body_pose(self, body: Body, pose: np.ndarray):
+        """
+        Set the pose of a body to the given pose.
+        :param body: The body to which the pose is applied.
+        :param pose: A 4x4 transformation matrix representing the pose of the body.
+        """
+        pass
+
+    def get_body_pose(self, body: Body, relative_body: Body = None) -> np.ndarray:
+        """
+        Get the pose of a body.
+        :param body: The body for which the pose is requested.
+        :param relative_body: The body with respect to which the pose is requested.
+            If None, the root body is used.
+        :return: A 4x4 transformation matrix representing the pose of the body.
+        """
+        return self.compute_forward_kinematics_np(relative_body or self.root, body)
+
+    def compute_inverse_kinematics(self, body: Body, pose: np.ndarray) -> Dict[Connection, float]:
+        """
+        Computes the inverse kinematics for a body to reach a desired pose. Only the final position needs to match the
+        pose, the movent to the pose is not that relevant.
+
+        :param body: The body for which the inverse kinematics is computed.
+        :param pose: The desired pose as a 4x4 transformation matrix.
+        :return: A dictionary mapping degree of freedom to their required values. Not sure about that, I gues whatever maps the joints to values is fine
+        """
+        pass
+
+    def set_joint_state(self, connection: Connection, state: float):
+        """
+        Sets the value of a 1-DOF connection to the given value. If the connection has more than 1-DOF an error is raised.
+        :param connection: The connection to which the value is applied.
+        :param state: The value to which the connection is applied.
+        """
+        pass
+
+    def set_connection_state(self, connection: Connection, state: float):
+        """
+        Maybe a better name than set_joint_state
+        """
+        pass
+
