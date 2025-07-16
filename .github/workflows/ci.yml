@@ -32,6 +32,8 @@ jobs:
         cd /opt/ros/overlay_ws/src/semantic_world
         source ../semantic_world-venv/bin/activate    
         pip install -U pip && pip install -r requirements.txt && pip install . && pip install -r doc/requirements.txt
+        echo "PATH=$PWD/ultiverse-Parser/ext/blender:$PWD/ultiverse-Parser/USD/linux/lib/python:$PWD/ultiverse-Parser/USD/linux/plugin/usd:$PATH" >> $GITHUB_ENV
+        echo "PYTHONPATH=$PWD/ultiverse-Parser/USD/linux/lib/python:$PWD/src" >> $GITHUB_ENV
 
     - name: Run tests
       run: |

@@ -18,9 +18,7 @@ RUN python3 -m venv semantic_world-venv --system-site-packages  && source semant
 
 # Install the Multiverse Parser
 RUN git clone https://github.com/Multiverse-Framework/Multiverse-Parser.git
-RUN source semantic_world-venv/bin/activate && pip install -r ../Multiverse-Parser/requirements.txt && pip install -e ../Multiverse-Parser
-RUN echo "PATH=$OVERLAY_WS/src/Multiverse-Parser/ext/blender:$OVERLAY_WS/src/Multiverse-Parser/USD/linux/lib/python:$OVERLAY_WS/src/Multiverse-Parser/USD/linux/plugin/usd:$PATH" >> $GITHUB_ENV
-RUN echo "PYTHONPATH=$OVERLAY_WS/src/Multiverse-Parser/USD/linux/lib/python:$OVERLAY_WS/src/src" >> $GITHUB_ENV
+RUN source semantic_world-venv/bin/activate && pip install -r Multiverse-Parser/requirements.txt && pip install -e Multiverse-Parser
 
 COPY entrypoint.sh /
 ENTRYPOINT ["bash", "/entrypoint.sh"]
