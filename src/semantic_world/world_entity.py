@@ -7,7 +7,7 @@ from collections import deque
 from collections.abc import Iterable, Mapping
 from dataclasses import dataclass, field
 from dataclasses import fields
-from functools import reduce, lru_cache
+from functools import reduce, lru_cache, cached_property
 from typing import (
     Deque,
     Type,
@@ -19,6 +19,8 @@ from typing import Set
 
 import numpy as np
 from scipy.stats import geom
+from trimesh import Trimesh
+from trimesh.util import concatenate
 from trimesh.proximity import closest_point, nearby_faces
 from trimesh.sample import sample_surface
 from typing_extensions import ClassVar
@@ -135,6 +137,16 @@ class Body(KinematicStructureEntity):
             c.origin.reference_frame = self
         for v in self.visual:
             v.origin.reference_frame = self
+
+    @cached_property
+    def combined_collision_mesh(self) -> Trimesh:
+        transformed_meshes = []
+        for shape in self.collision:
+            transform = shape.origin.to_np()
+            mesh = shape.mesh.copy()
+            mesh.apply_transform(transform)
+            transformed_meshes.append(mesh)
+        return concatenate(transformed_meshes)
 
     def __hash__(self):
         return hash(self.name)

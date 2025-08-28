@@ -313,6 +313,9 @@ class World:
         assert len(self.kinematic_structure_entities) == (len(self.connections) + 1)
         assert rx.is_weakly_connected(self.kinematic_structure)
         actual_dofs = set()
+        if not len(set([body.name for body in self.kinematic_structure_entities])) == len(self.kinematic_structure_entities):
+            raise ValueError("Body names must be unique.")
+
         for connection in self.connections:
             actual_dofs.update(connection.dofs)
         assert actual_dofs == set(
@@ -387,10 +390,10 @@ class World:
         """
         if not self.world_is_being_modified:
             self.reset_cache()
+            self.validate()
             self.compile_forward_kinematics_expressions()
             self.notify_state_change()
             self._model_version += 1
-            self.validate()
 
     def delete_orphaned_dofs(self):
         actual_dofs = set()
